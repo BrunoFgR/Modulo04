@@ -1,6 +1,7 @@
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
 
+
 class CreateTransactionService {
   private transactionsRepository: TransactionsRepository;
 
@@ -8,8 +9,20 @@ class CreateTransactionService {
     this.transactionsRepository = transactionsRepository;
   }
 
-  public execute(): Transaction {
-    // TODO
+  public execute({ title, type, value } : Omit<Transaction, 'id'>): Transaction {
+    const { total } = this.transactionsRepository.getBalance()
+
+    if(type === 'outcome' && value > total) {
+      throw Error('Balance cannot be negative')
+    }
+
+    const transaction = this.transactionsRepository.create({
+      title,
+      type,
+      value
+    })
+
+    return transaction
   }
 }
 
